@@ -18,36 +18,26 @@
 
         @Override
         public User getUser(String username) {
-            String query = "SELECT * FROM users WHERE userName = ?";
-            User user = null;
+            String sql = "SELECT * FROM users WHERE username = ? ";
             try {
                 conn =  DBConnectionMySql.getConnection();
-                ps = conn.prepareStatement(query);
+                ps = conn.prepareStatement(sql);
                 ps.setString(1, username);
                 rs = ps.executeQuery();
-                ps.setString(1, username);
-                try (ResultSet rs = ps.executeQuery()) {
-                    if (rs.next()) {
-                        // Assuming the User table has columns: id, email, userName, fullName, passWord, avatar, roleid, phone, createdDate
-                        int id = rs.getInt("id");
-                        String email = rs.getString("email");
-                        String userName = rs.getString("userName");
-//
-                        String password = rs.getString("password");
-                        String avatar = rs.getString("avatar");
-                        String roleid = rs.getString("roleid");
-                        String phone = rs.getString("phone");
-                        Date createdDate = rs.getDate("createdDate");
-
-//                         user = new User(id, email, userName, password, avatar, roleid,phone, createdDate);
-                    }
+                while (rs.next()) {
+                    User user = new User();
+                    user.setId(rs.getInt("id"));
+                    user.setEmail(rs.getString("email"));
+                    user.setUserName(rs.getString("username"));
+                    user.setPassWord(rs.getString("password"));
+                    user.setAvatar(rs.getString("avatar"));
+                    user.setRoleid(Integer.parseInt(rs.getString("roleid")));
+                    user.setPhone(rs.getString("phone"));
+                    user.setCreatedDate(rs.getDate("createdDate"));
+                    return user;
                 }
-            } catch (SQLException e) {
-                e.printStackTrace(); // You may want to use a logger instead of printStackTrace in a production environment
-            }
-            return user;
-
-
+            } catch (Exception e) {e.printStackTrace(); }
+            return null;
         }
 
 

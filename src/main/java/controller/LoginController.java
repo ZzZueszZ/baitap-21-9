@@ -2,44 +2,68 @@ package controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
+import model.User;
+import service.User.IUserService;
+import service.User.UserServiceImpl;
 
 import java.io.IOException;
 
 @WebServlet(urlPatterns = {"/login"})
 public class LoginController extends HttpServlet {
+    public static final String SESSION_USERNAME = "username";
+    public static final String COOKIE_REMEMBER = "username";
+
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Display the login page
-        response.setContentType("text/html");
-        request.getRequestDispatcher("/view/login.jsp").forward(request, response);
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        HttpSession session = req.getSession(false);
+        if (session != null && session.getAttribute("account") != null) {
+            resp.sendRedirect(req.getContextPath() + "/waiting");
+            return;
+        }
+        req.getRequestDispatcher("/view/login.jsp").forward(req, resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Set character encoding
+        req.setCharacterEncoding("UTF-8");
+        resp.setContentType("text/html;charset=UTF-8");
+
         String username = req.getParameter("username");
         String password = req.getParameter("password");
+        String remember = req.getParameter("remember");
+        boolean isRememberMe = "on".equals(remember);
 
-        boolean loginSuccess = false;
-
-        // Validate username and password
-        if (username != null && password != null && "admin".equals(username) && "admin".equals(password)) {
-            loginSuccess = true;
+        // Validate inputs
+        if (username == null || username.trim().isEmpty() || password == null || password.trim().isEmpty()) {
+            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không được rỗng");
+            req.getRequestDispatcher("/view/login.jsp").forward(req, resp);
+            return;
         }
 
-        if (loginSuccess) {
-            req.setAttribute("username", username);
-            req.setAttribute("msg", "Login successful!");
-            // Redirect to home page on successful login
-            req.getRequestDispatcher("/view/home.jsp").forward(req, resp);
+        // Login logic
+        UserServiceImpl service = new UserServiceImpl();
+        User user = service.login(username, password);
+        if (user != null) {
+            HttpSession session = req.getSession(true);
+            session.setAttribute("account", user);
+
+            // Handle remember me functionality
+            if (isRememberMe) {
+                saveRememberMe(resp, username);
+            }
+            resp.sendRedirect(req.getContextPath() + "/waiting");
         } else {
-            // Handle failed login attempt
-            req.setAttribute("msg", "Invalid username or password");
-            req.getRequestDispatcher("/view/login.html").forward(req, resp);
+            req.setAttribute("alert", "Tài khoản hoặc mật khẩu không đúng");
+            req.getRequestDispatcher("/view/login.jsp").forward(req, resp);
         }
+    }
+
+    private void saveRememberMe(HttpServletResponse response, String username) {
+        Cookie cookie = new Cookie("rememberMe", username); // Ensure the cookie name is relevant
+        cookie.setMaxAge(30 * 24 * 60 * 60); // Cookie lasts for 30 days
+        cookie.setPath("/"); // Set path to allow access in the entire application
+        response.addCookie(cookie);
     }
 }

@@ -27,12 +27,12 @@ public class DBConnectionMySql {
         Date date = new Date(2004);
         String insertSQL = "INSERT INTO users (email, userName, password, avatar, roleid, phone, createdDate) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement pstmt = conn.prepareStatement(insertSQL)) {
-            pstmt.setString(1, "example@example.com");
-            pstmt.setString(2, "exampleUser");
+            pstmt.setString(1, "admin@example.com");
+            pstmt.setString(2, "admin");
 //            pstmt.setString(3, "Example User");
-            pstmt.setString(3, "password123");
+            pstmt.setString(3, "admin");
             pstmt.setString(4, "default_avatar.png");
-            pstmt.setInt(5, 1);
+            pstmt.setInt(5, 2);
             pstmt.setString(6, "1234567890");
             pstmt.setDate(7, date); // Sử dụng ngày hiện tại
 

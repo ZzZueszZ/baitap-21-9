@@ -9,25 +9,30 @@ import java.util.Date;
         private int id;
         private String email;
         private String userName;
-        private String fullName;
         private String passWord;
         private String avatar;
+        private int roleid;
+        private String phone;
+        private Date createdDate;
 
-    public String getEmail() {
-        return email;
-    }
-
-    public User(int id, String email, String userName, String fullName, String passWord, String avatar, int roleid, String phone, Date createdDate) {
+    public User(int id, String email, String userName, String passWord, String avatar, int roleid, String phone, Date createdDate) {
         this.id = id;
         this.email = email;
         this.userName = userName;
-        this.fullName = fullName;
         this.passWord = passWord;
         this.avatar = avatar;
         this.roleid = roleid;
         this.phone = phone;
         this.createdDate = createdDate;
     }
+
+    public User() {
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
 
     public void setEmail(String email) {
         this.email = email;
@@ -47,14 +52,6 @@ import java.util.Date;
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public String getFullName() {
-        return fullName;
-    }
-
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
     }
 
     public String getPassWord() {
@@ -97,8 +94,6 @@ import java.util.Date;
         this.createdDate = createdDate;
     }
 
-    private int roleid;
-    private String phone;
-    private Date createdDate;
+
 
     }
