@@ -7,14 +7,7 @@ public interface IUserService {
 
     User login(String username, String password);
 
-    void insert(User user);
 
-    boolean register(String email, String password, String username, String
-            fullname, String phone);
+    boolean register(String email,String username, String password, int role, String phone);
 
-    boolean checkExistEmail(String email);
-
-    boolean checkExistUsername(String username);
-
-    boolean checkExistPhone(String phone);
 }

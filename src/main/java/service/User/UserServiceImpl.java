@@ -2,8 +2,10 @@ package service.User;
 
 import DAO.IUserDao;
 import DAO.UserDaoImpl;
+import controller.db.DBConnectionMySql;
 import model.User;
 
+import java.sql.Date;
 import java.sql.SQLException;
 
 public class UserServiceImpl implements IUserService{
@@ -21,31 +23,29 @@ public class UserServiceImpl implements IUserService{
         }
         return null;
     }
-
     @Override
-    public void insert(User user) {
+    public boolean register(String email, String username, String password, int roleid, String phone) {
+        // Kiểm tra sự tồn tại của tên tài khoản, email và số điện thoại
+        if (userDao.checkExistUsername(username) || userDao.checkExistEmail(email) || userDao.checkExistPhone(phone)) {
+            return false; // Nếu đã tồn tại thì không thực hiện đăng ký
+        }
 
+        // Tạo đối tượng User
+        User newUser = new User();
+        newUser.setEmail(email);
+        newUser.setUserName(username);
+        newUser.setPassWord(password); // Nên mã hóa mật khẩu
+        newUser.setAvatar("null"); // Thay đổi nếu cần
+        newUser.setRoleid(roleid);
+        newUser.setPhone(phone);
+        newUser.setCreatedDate(new Date(System.currentTimeMillis())); // Ngày tạo
+
+        // Chèn người dùng vào cơ sở dữ liệu
+        userDao.insert(newUser);
+        return true;
     }
 
-    @Override
-    public boolean register(String email, String password, String username, String fullname, String phone) {
-        return false;
-    }
 
-    @Override
-    public boolean checkExistEmail(String email) {
-        return false;
-    }
-
-    @Override
-    public boolean checkExistUsername(String username) {
-        return false;
-    }
-
-    @Override
-    public boolean checkExistPhone(String phone) {
-        return false;
-    }
 
     public static void main(String[] args) throws SQLException {
         UserServiceImpl userService = new UserServiceImpl();
