@@ -117,6 +117,43 @@ public class UserDaoImpl implements IUserDao {
         return false;
     }
 
+    @Override
+    public String updatePassword(String email, String newPassword) {
+        String resultMessage = "Cập nhật mật khẩu không thành công.";
+        String sql = "UPDATE users SET password = ? WHERE email = ?";
+
+        try {
+            conn = DBConnectionMySql.getConnection();
+            ps = conn.prepareStatement(sql);
+
+            // Mã hóa mật khẩu trước khi lưu vào cơ sở dữ liệu
+            String hashedPassword = hashPassword(newPassword); // Phương thức mã hóa mật khẩu
+
+            ps.setString(1, hashedPassword);
+            ps.setString(2, email);
+
+            int rowsAffected = ps.executeUpdate(); // Thực hiện cập nhật
+
+            if (rowsAffected > 0) {
+                resultMessage = "Mật khẩu đã được cập nhật thành công.";
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            resultMessage = "Đã xảy ra lỗi trong quá trình cập nhật mật khẩu.";
+        } finally {
+            closeResources();
+        }
+
+        return resultMessage;
+    }
+
+    private String hashPassword(String password) {
+        // Sử dụng bcrypt hoặc một phương thức mã hóa an toàn khác
+        // Ví dụ: return BCrypt.hashpw(password, BCrypt.gensalt());
+        return password; // Thay thế bằng mã hóa thực tế
+    }
+
+
     private void closeResources() {
         try {
             if (rs != null) rs.close();
