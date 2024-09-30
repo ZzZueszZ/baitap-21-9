@@ -2,17 +2,21 @@ package controller;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import model.User;
 import service.User.IUserService;
 import service.User.UserServiceImpl;
 
 import java.io.IOException;
 
-@WebServlet(urlPatterns = {"/login"})
+@WebServlet("/login")
 public class LoginController extends HttpServlet {
     public static final String SESSION_USERNAME = "username";
-    public static final String COOKIE_REMEMBER = "username";
+    public static final String COOKIE_REMEMBER = "rememberMe";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -43,7 +47,7 @@ public class LoginController extends HttpServlet {
         }
 
         // Login logic
-        UserServiceImpl service = new UserServiceImpl();
+        IUserService service = new UserServiceImpl(); // Sử dụng interface
         User user = service.login(username, password);
         if (user != null) {
             HttpSession session = req.getSession(true);
@@ -56,14 +60,14 @@ public class LoginController extends HttpServlet {
             resp.sendRedirect(req.getContextPath() + "/waiting");
         } else {
             req.setAttribute("alert", "Tài khoản hoặc mật khẩu không đúng");
-            req.getRequestDispatcher("/view/login.jsp").forward(req, resp);
+            req.getRequestDispatcher("/view/login.jsp").forward(req, resp); // Gửi đến /login khi có lỗi
         }
     }
 
     private void saveRememberMe(HttpServletResponse response, String username) {
-        Cookie cookie = new Cookie("rememberMe", username); // Ensure the cookie name is relevant
+        Cookie cookie = new Cookie(COOKIE_REMEMBER, username);
         cookie.setMaxAge(30 * 24 * 60 * 60); // Cookie lasts for 30 days
-        cookie.setPath("/"); // Set path to allow access in the entire application
+        cookie.setPath("/");
         response.addCookie(cookie);
     }
 }

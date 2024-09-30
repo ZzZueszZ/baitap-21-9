@@ -50,7 +50,7 @@
     <c:if test="${not empty alert}">
         <div class="alert alert-danger">${alert}</div>
     </c:if>
-    <form action="login" method="post">
+    <form action="/login" method="post">
         <div class="form-group">
             <label for="username">Tài khoản</label>
             <input type="text" class="form-control" id="username" name="username" placeholder="Nhập tài khoản" required>
